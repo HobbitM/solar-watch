@@ -3,6 +3,7 @@ package com.example.solarwatch.service;
 import com.example.solarwatch.model.LatAndLonReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,8 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class LatAndLonService {
 
-    private static final String API_KEY = "92614706192153529ec055e4f8633652";
+    @Value("${openweather.api.key}")
+    private String API_KEY;
 
     private final RestTemplate restTemplate;
 
