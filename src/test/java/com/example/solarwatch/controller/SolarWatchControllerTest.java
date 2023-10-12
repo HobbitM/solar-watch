@@ -35,16 +35,14 @@ class SolarWatchControllerTest {
 
     @Test
     public void testGetSunriseSunsetForDate() throws Exception {
-        // Arrange
         double lat = 10.0;
         double lon = 20.0;
         LocalDate date = LocalDate.of(2023, 10, 4);
         SunriseSunsetReport mockReport = new SunriseSunsetReport(new SunriseSunsetResults("6:00:00 AM", "6:00:00 PM"));
 
         Mockito.when(latAndLonService.getLatAndLonFromCity(Mockito.anyString())).thenReturn(new LatAndLonReport(lat, lon));
-        Mockito.when(sunriseSunsetService.getSunriseSunsetForDate(lat, lon, date)).thenReturn(mockReport);
+        Mockito.when(sunriseSunsetService.getSunriseSunset(lat, lon, date)).thenReturn(mockReport);
 
-        // Act
         mockMvc.perform(get("/solar-watch")
                         .param("date", "2023-10-04")
                         .param("city", "SampleCity")
@@ -56,7 +54,6 @@ class SolarWatchControllerTest {
 
     @Test
     public void testGetSunriseSunset() throws Exception {
-        // Arrange
         double lat = 10.0;
         double lon = 20.0;
         SunriseSunsetReport mockReport = new SunriseSunsetReport(new SunriseSunsetResults("6:00:00 AM", "6:00:00 PM"));
@@ -64,7 +61,6 @@ class SolarWatchControllerTest {
         Mockito.when(latAndLonService.getLatAndLonFromCity(Mockito.anyString())).thenReturn(new LatAndLonReport(lat, lon));
         Mockito.when(sunriseSunsetService.getSunriseSunset(lat, lon)).thenReturn(mockReport);
 
-        // Act
         mockMvc.perform(get("/solar-watch")
                         .param("city", "SampleCity")
                         .contentType(MediaType.APPLICATION_JSON))

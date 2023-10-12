@@ -25,8 +25,7 @@ class SunriseSunsetServiceTest {
     private RestTemplate restTemplate;
 
     @Test
-    public void testGetSunriseSunsetForDate() {
-        // Arrange
+    public void testGetSunriseSunsetWithDate() {
         double lat = 10.0;
         double lon = 20.0;
         LocalDate date = LocalDate.of(2023, 10, 4);
@@ -35,18 +34,15 @@ class SunriseSunsetServiceTest {
         Mockito.when(restTemplate.getForObject(Mockito.anyString(), Mockito.eq(SunriseSunsetReport.class)))
                 .thenReturn(mockReport);
 
-        // Act
-        SunriseSunsetReport result = sunriseSunsetService.getSunriseSunsetForDate(lat, lon, date);
+        SunriseSunsetReport result = sunriseSunsetService.getSunriseSunset(lat, lon, date);
 
-        // Assert
         assertNotNull(result);
         assertEquals("6:00:00 AM", result.results().sunrise());
         assertEquals("6:00:00 PM", result.results().sunset());
     }
 
     @Test
-    public void testGetSunriseSunset() {
-        // Arrange
+    public void testGetSunriseSunsetWithoutDate() {
         double lat = 10.0;
         double lon = 20.0;
         SunriseSunsetReport mockReport = new SunriseSunsetReport(new SunriseSunsetResults("6:00:00 AM", "6:00:00 PM"));
@@ -54,10 +50,8 @@ class SunriseSunsetServiceTest {
         Mockito.when(restTemplate.getForObject(Mockito.anyString(), Mockito.eq(SunriseSunsetReport.class)))
                 .thenReturn(mockReport);
 
-        // Act
         SunriseSunsetReport result = sunriseSunsetService.getSunriseSunset(lat, lon);
 
-        // Assert
         assertNotNull(result);
         assertEquals("6:00:00 AM", result.results().sunrise());
         assertEquals("6:00:00 PM", result.results().sunset());

@@ -18,8 +18,7 @@ public class SunriseSunsetService {
         this.restTemplate = restTemplate;
     }
 
-
-    public SunriseSunsetReport getSunriseSunsetForDate(double lat, double lon, LocalDate date) {
+    public SunriseSunsetReport getSunriseSunset(double lat, double lon, LocalDate date) {
         try {
             String url = String.format("https://api.sunrise-sunset.org/json?lat=%s&lng=%s&date=%s", lat, lon, date);
 
@@ -38,7 +37,7 @@ public class SunriseSunsetService {
         }
     }
 
-    public SunriseSunsetReport getSunriseSunset(double lat, double lon ) {
+    public SunriseSunsetReport getSunriseSunset(double lat, double lon) {
         try {
             String url = String.format("https://api.sunrise-sunset.org/json?lat=%s&lng=%s", lat, lon);
 
