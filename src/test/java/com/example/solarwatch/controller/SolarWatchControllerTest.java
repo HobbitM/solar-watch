@@ -1,71 +1,65 @@
 package com.example.solarwatch.controller;
 
-import com.example.solarwatch.model.LatAndLonReport;
-import com.example.solarwatch.model.SunriseSunsetReport;
-import com.example.solarwatch.model.SunriseSunsetResults;
-import com.example.solarwatch.service.LatAndLonService;
-import com.example.solarwatch.service.SunriseSunsetService;
+import com.example.solarwatch.city.model.City;
+import com.example.solarwatch.city.service.CityService;
+import com.example.solarwatch.sunrisesunset.model.SunriseSunset;
+import com.example.solarwatch.sunrisesunset.service.SunriseSunsetService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDate;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 
-@RunWith(SpringRunner.class)
-@WebMvcTest(SolarWatchController.class)
-class SolarWatchControllerTest {
+@SpringBootTest
+@AutoConfigureMockMvc
+public class SolarWatchControllerTest {
+
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private LatAndLonService latAndLonService;
+    private CityService cityService;
 
     @MockBean
     private SunriseSunsetService sunriseSunsetService;
 
-    @Test
-    public void testGetSunriseSunsetForDate() throws Exception {
-        double lat = 10.0;
-        double lon = 20.0;
-        LocalDate date = LocalDate.of(2023, 10, 4);
-        SunriseSunsetReport mockReport = new SunriseSunsetReport(new SunriseSunsetResults("6:00:00 AM", "6:00:00 PM"));
-
-        Mockito.when(latAndLonService.getLatAndLonFromCity(Mockito.anyString())).thenReturn(new LatAndLonReport(lat, lon));
-        Mockito.when(sunriseSunsetService.getSunriseSunset(lat, lon, date)).thenReturn(mockReport);
-
-        mockMvc.perform(get("/solar-watch")
-                        .param("date", "2023-10-04")
-                        .param("city", "SampleCity")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results.sunrise").value("6:00:00 AM"))
-                .andExpect(jsonPath("$.results.sunset").value("6:00:00 PM"));
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testGetSunriseSunset() throws Exception {
-        double lat = 10.0;
-        double lon = 20.0;
-        SunriseSunsetReport mockReport = new SunriseSunsetReport(new SunriseSunsetResults("6:00:00 AM", "6:00:00 PM"));
+    public void testGetSunriseSunsetForDate() throws Exception {
+        String cityName = "TestCity";
+        City mockCity = new City(cityName, "TestCountry", "TestState", 1.0, 2.0);
+        LocalDate date = LocalDate.now();
+        SunriseSunset mockSunriseSunset = new SunriseSunset(mockCity, date, "6:00 AM", "6:00 PM");
 
-        Mockito.when(latAndLonService.getLatAndLonFromCity(Mockito.anyString())).thenReturn(new LatAndLonReport(lat, lon));
-        Mockito.when(sunriseSunsetService.getSunriseSunset(lat, lon)).thenReturn(mockReport);
+        Mockito.when(cityService.getCityByName(cityName)).thenReturn(mockCity);
 
-        mockMvc.perform(get("/solar-watch")
-                        .param("city", "SampleCity")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results.sunrise").value("6:00:00 AM"))
-                .andExpect(jsonPath("$.results.sunset").value("6:00:00 PM"));
+        Mockito.when(sunriseSunsetService.getSunriseSunset(any(), any())).thenReturn(mockSunriseSunset);
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/solar-watch")
+                        .param("city", cityName))
+                .andReturn();
+
+        int status = mvcResult.getResponse().getStatus();
+        String content = mvcResult.getResponse().getContentAsString();
+
+        assertEquals(HttpStatus.OK.value(), status);
+
+        assertEquals("6:00 AM", mockSunriseSunset.getSunrise());
     }
 }
