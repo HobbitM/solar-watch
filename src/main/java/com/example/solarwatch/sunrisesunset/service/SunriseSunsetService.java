@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 
@@ -23,15 +24,25 @@ public class SunriseSunsetService {
     private final SunriseSunsetRepository sunriseSunsetRepository;
 
 
+
+
 @Autowired
     public SunriseSunsetService(RestTemplate restTemplate, SunriseSunsetRepository sunriseSunsetRepository) {
         this.restTemplate = restTemplate;
         this.sunriseSunsetRepository = sunriseSunsetRepository;
     }
 
+    protected LocalDate getCurrentDate() {
+        return LocalDate.now();
+    }
     public SunriseSunset getSunriseSunsetFromApi(City city, double lat, double lon, LocalDate date) {
-          try {
-            String url = String.format("https://api.sunrise-sunset.org/json?lat=%s&lng=%s&date=%s", lat, lon, date);
+        try {
+            if (date == null) {
+                date = getCurrentDate();
+            }
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            String formattedDate = date.format(formatter);
+            String url = String.format("https://api.sunrise-sunset.org/json?lat=%s&lng=%s&date=%s", lat, lon, formattedDate);
 
             ResponseEntity<SunriseSunsetResponse> responseEntity = restTemplate.getForEntity(url, SunriseSunsetResponse.class);
 
@@ -41,7 +52,7 @@ public class SunriseSunsetService {
                     String sunrise = sunriseSunsetResponse.getResults().getSunrise();
                     String sunset = sunriseSunsetResponse.getResults().getSunset();
 
-                    return new SunriseSunset(city, date, sunrise, sunset);
+                    return new SunriseSunset(city, getCurrentDate(), sunrise, sunset);
                 } else {
                     throw new RuntimeException("Empty or null response from Sunrise-Sunset API.");
                 }

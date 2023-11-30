@@ -31,10 +31,8 @@ public class SolarWatchController {
         if (cityEntity == null) {
             cityEntity = cityService.getCityFromOpenWeatherAPI(city);
             cityService.addCity(cityEntity.getName(), cityEntity.getCountry(), cityEntity.getState(), cityEntity.getLat(), cityEntity.getLon());
-
             cityEntity = cityService.getCityByName(city);
         }
-
         if (date == null) {
             date = LocalDate.now();
         }
