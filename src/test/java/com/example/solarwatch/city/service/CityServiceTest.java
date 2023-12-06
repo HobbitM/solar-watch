@@ -7,9 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+import static org.mockito.ArgumentMatchers.eq;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,10 +25,14 @@ class CityServiceTest {
     @Mock
     private CityRepository cityRepository;
 
+    @Value("${openweather.api.key}")
+    private String apiKey;
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         cityService = new CityService(restTemplate, cityRepository);
+        cityService.setApiKey(apiKey);
     }
 
     @Test
@@ -61,13 +67,12 @@ class CityServiceTest {
     @Test
     public void testGetCityFromOpenWeatherAPI() {
         String cityName = "TestCity";
-        String apiKey = "YourAPIKey";
         City city = new City(cityName, "TestCountry", "TestState", 1.0, 2.0);
 
-        Mockito.when(restTemplate.getForEntity(any(), any()))
-                .thenReturn(new ResponseEntity<>(new City[]{city}, HttpStatus.OK));
+        ResponseEntity<City[]> responseEntity = new ResponseEntity<>(new City[]{city}, HttpStatus.OK);
 
-        cityService.setApiKey(apiKey);
+        Mockito.when(restTemplate.getForEntity(any(String.class), eq(City[].class)))
+                .thenReturn(responseEntity);
 
         City result = cityService.getCityFromOpenWeatherAPI(cityName);
 

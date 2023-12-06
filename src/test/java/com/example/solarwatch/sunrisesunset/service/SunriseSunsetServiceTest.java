@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+import static org.mockito.ArgumentMatchers.eq;
 
 import java.time.LocalDate;
 
@@ -43,8 +44,10 @@ class SunriseSunsetServiceTest {
         SunriseSunsetResponse sunriseSunsetResponse = new SunriseSunsetResponse();
         sunriseSunsetResponse.setResults(new Results("6:00 AM", "6:00 PM"));
 
-        Mockito.when(restTemplate.getForEntity(any(), any()))
-                .thenReturn(new ResponseEntity<>(sunriseSunsetResponse, HttpStatus.OK));
+        ResponseEntity<SunriseSunsetResponse> responseEntity = new ResponseEntity<>(sunriseSunsetResponse, HttpStatus.OK);
+
+        Mockito.when(restTemplate.getForEntity(any(String.class), eq(SunriseSunsetResponse.class)))
+                .thenReturn(responseEntity);
 
         SunriseSunset sunriseSunset = sunriseSunsetService.getSunriseSunsetFromApi(city, city.getLat(), city.getLon(), date);
 
