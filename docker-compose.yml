@@ -1,0 +1,19 @@
+version: '3'
+services:
+  my-postgres-container:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: tralala
+      POSTGRES_USER: postgres
+      POSTGRES_DB: solarwatch
+    ports:
+      - "5432:5432"
+
+  my-spring-app-container:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - my-postgres-container
+    ports:
+      - "8090:8080"
