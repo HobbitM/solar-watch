@@ -22,9 +22,9 @@ Simple frontend created for easy app usage:
 
 1. Clone the repository to your local environment.
 2. Clone the frontend repository.
-2. Configure PostgreSQL database settings according to the information in the configuration file.
-3. Run backend + fronted parts of the project.
-4. Open a web browser and enter: `http://localhost:3000` to check the application.
+3. Configure Postgres database settings according to the information in the configuration file.
+4. Run backend + fronted parts of the project.
+5. Open a web browser and enter: `http://localhost:3000` to check the application.
 
 
 ### Key Features
