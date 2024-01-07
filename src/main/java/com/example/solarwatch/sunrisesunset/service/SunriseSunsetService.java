@@ -68,7 +68,7 @@ public class SunriseSunsetService {
     public void addSunriseSunset(City city,LocalDate date , String sunrise, String sunset){
     sunriseSunsetRepository.save(new SunriseSunset(city, date, sunrise, sunset));
     }
-    //zwracac optional
+
     public SunriseSunset getSunriseSunset(City city, LocalDate date) {
         return sunriseSunsetRepository.findByCityAndDate(city, date)
                 .orElse(null);
